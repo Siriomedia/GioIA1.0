@@ -35,6 +35,14 @@ GioIA is an Italian payslip analysis tool that uses Google's Gemini AI to analyz
 ### Firebase Configuration
 Firebase configuration is included in `src/firebase.ts`. The Firebase client API keys are safe to expose in client-side code as Firebase uses security rules to protect data.
 
+**Important**: To enable Google Sign-In on Replit, you must add the Replit domain to Firebase's authorized domains:
+1. Go to the [Firebase Console](https://console.firebase.google.com)
+2. Select your project (gioia-e1f29)
+3. Navigate to Authentication > Settings > Authorized domains
+4. Add your Replit domain (e.g., `*.replit.dev`)
+
+Without this, you'll see an `auth/unauthorized-domain` error when attempting to sign in.
+
 ## File Structure
 ```
 /
@@ -63,8 +71,13 @@ Firebase configuration is included in `src/firebase.ts`. The Firebase client API
 ## Recent Changes (Nov 18, 2025)
 - Imported from GitHub to Replit
 - Updated Vite config to use port 5000 for Replit compatibility
+- Added `allowedHosts: true` to Vite config for Replit's proxy
 - Configured HMR for Replit's proxy environment
+- Removed importmap from index.html (Vite handles module resolution)
+- Added proper module script tag for React app entry point
+- Created index.css for basic styling
 - Set up development workflow
+- Configured deployment for autoscale with build and preview
 
 ## Running the Application
 The development server is configured to run automatically on port 5000.
