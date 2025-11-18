@@ -149,7 +149,15 @@ Without this, you'll see an `auth/unauthorized-domain` error when attempting to 
 
 ## Running the Application
 The development server is configured to run automatically on port 5000.
-Command: `npm run dev`
+- Development: `npm run dev` (port 5000)
+- Build: `npm run build`
+- Preview (production): `npm run preview` (port 5000)
+
+## Deployment Configuration
+The app is configured for **Autoscale** deployment on Replit:
+- Build command: `npm run build`
+- Run command: `npm run preview`
+- Port: 5000 (configured in vite.config.ts for both dev and preview modes)
 
 ## Notes
 - The app uses localStorage for caching user data and documents
