@@ -5,11 +5,11 @@ import { CheckIcon } from "./common/Icons.tsx";
 
 interface SubscriptionProps {
     user: User;
-    onPlanChange: (plan: Plan) => void;      // CAMBIA piano DOPO PAGAMENTO
-    onAddCredits: (credits: number) => void; // AGGIUNGE crediti DOPO PAGAMENTO
+    onPlanChange: (plan: Plan) => void;
+    onAddCredits: (credits: number) => void;
 }
 
-const PLAN_PRICES: Record<Plan, string> = {
+const PACKAGE_PRICES: Record<Plan, string> = {
     free: "0.00",
     basic: "0.99",
     medium: "1.99",
@@ -17,18 +17,23 @@ const PLAN_PRICES: Record<Plan, string> = {
     professional: "5.99",
 };
 
+declare global {
+    interface Window {
+        paypal: any;
+    }
+}
+
 const Subscription: React.FC<SubscriptionProps> = ({ user, onPlanChange, onAddCredits }) => {
 
     useEffect(() => {
         if (!window.paypal) return;
 
-        (Object.keys(PLANS) as Plan[]).forEach((planKey) => {
+        (Object.keys(PLANS) as Plan[]).forEach((packageKey) => {
+            if (packageKey === "free") return;
 
-            if (planKey === "free") return; // Nessun pagamento
-
-            const containerId = `paypal-btn-plan-${planKey}`;
+            const containerId = `paypal-button-${packageKey}`;
             const container = document.getElementById(containerId);
-            if (container) container.innerHTML = ""; // evitiamo doppi render
+            if (container) container.innerHTML = "";
 
             window.paypal
                 .Buttons({
@@ -43,8 +48,8 @@ const Subscription: React.FC<SubscriptionProps> = ({ user, onPlanChange, onAddCr
                         return actions.order.create({
                             purchase_units: [
                                 {
-                                    description: `Acquisto piano: ${PLANS[planKey].name}`,
-                                    amount: { value: PLAN_PRICES[planKey] },
+                                    description: `Pacchetto crediti: ${PLANS[packageKey].name}`,
+                                    amount: { value: PACKAGE_PRICES[packageKey] },
                                 },
                             ],
                         });
@@ -52,109 +57,92 @@ const Subscription: React.FC<SubscriptionProps> = ({ user, onPlanChange, onAddCr
 
                     onApprove: async (data: any, actions: any) => {
                         const orderDetails = await actions.order.capture();
-
                         console.log('Pagamento completato:', orderDetails);
 
-                        const creditsToAdd = PLANS[planKey].credits;
+                        const creditsToAdd = PLANS[packageKey].credits;
 
-                        // Aggiunge crediti al saldo esistente
                         onAddCredits(creditsToAdd);
-
-                        // Aggiorna piano utente (per tracking)
-                        onPlanChange(planKey);
+                        onPlanChange(packageKey);
 
                         alert(
-                            `✅ Pagamento completato con successo! 
-                            
-Pacchetto: ${PLANS[planKey].name}
-Crediti aggiunti: ${creditsToAdd}
-Nuovo saldo: ${user.credits + creditsToAdd} crediti
-
-Grazie per il tuo acquisto!`
+                            `✅ Pagamento completato con successo!\n\nPacchetto: ${PLANS[packageKey].name}\nCrediti aggiunti: ${creditsToAdd}\nNuovo saldo: ${user.credits + creditsToAdd} crediti\n\nGrazie per il tuo acquisto!`
                         );
                     },
 
                     onError: (err: any) => {
-                        console.error("PayPal Error", err);
-                        alert("Errore durante il pagamento PayPal.");
+                        console.error("Errore PayPal:", err);
+                        alert("Errore durante il pagamento. Riprova più tardi.");
                     },
                 })
                 .render(`#${containerId}`);
         });
-    }, [onPlanChange, onAddCredits]);
+    }, [onPlanChange, onAddCredits, user.credits]);
 
     return (
-        <div>
-            {/* --- TITOLO --- */}
+        <div className="p-6">
             <div className="text-center mb-12">
-                <h1 className="text-4xl font-bold text-gray-800">Ricarica i crediti</h1>
-                <p className="text-lg text-gray-500 mt-4 max-w-2xl mx-auto">
+                <h1 className="text-4xl font-bold text-gray-800 mb-4">Ricarica i crediti</h1>
+                <p className="text-lg text-gray-500 max-w-2xl mx-auto">
                     Acquista pacchetti di crediti che si aggiungono al tuo saldo attuale. Nessun abbonamento, nessun rinnovo automatico.
                 </p>
             </div>
 
-            {/* --- PIANI --- */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {(Object.keys(PLANS) as Plan[]).map((planKey) => {
-                    const plan = PLANS[planKey];
-                    const isCurrentPlan = user.plan === planKey;
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+                {(Object.keys(PLANS) as Plan[]).map((packageKey) => {
+                    const pkg = PLANS[packageKey];
+                    const isBestValue = packageKey === 'professional';
 
                     return (
                         <div
-                            key={plan.name}
-                            className={`border-2 ${
-                                planKey === 'professional' ? 'border-blue-500 bg-blue-50' : "border-gray-200"
-                            } rounded-xl shadow-lg p-8 flex flex-col relative`}
+                            key={packageKey}
+                            className={`border-2 rounded-xl shadow-lg p-8 flex flex-col relative ${
+                                isBestValue ? 'border-blue-500 bg-blue-50' : "border-gray-200 bg-white"
+                            }`}
                         >
-                            {planKey === 'professional' && (
+                            {isBestValue && (
                                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-4 py-1 rounded-full text-sm font-semibold">
                                     Più conveniente
                                 </div>
                             )}
-                            <h2
-                                className={`text-2xl font-bold ${
-                                    planKey === 'professional' ? "text-blue-600" : "text-gray-800"
-                                }`}
-                            >
-                                {plan.name}
+
+                            <h2 className={`text-2xl font-bold mb-2 ${isBestValue ? "text-blue-600" : "text-gray-800"}`}>
+                                {pkg.name}
                             </h2>
 
-                            <p className="text-gray-500 mt-2 flex-grow">{plan.description}</p>
+                            <p className="text-gray-500 mb-6 flex-grow">{pkg.description}</p>
 
-                            <div className="my-8">
-                                <span className="text-5xl font-extrabold">
-                                    €{PLAN_PRICES[planKey]}
+                            <div className="mb-6">
+                                <span className="text-5xl font-extrabold text-gray-900">
+                                    €{PACKAGE_PRICES[packageKey]}
                                 </span>
                             </div>
 
                             <ul className="space-y-3 text-gray-600 mb-8">
-                                {plan.features.map((feature) => (
-                                    <li key={feature} className="flex items-start">
+                                {pkg.features.map((feature, index) => (
+                                    <li key={index} className="flex items-start">
                                         <CheckIcon className="w-5 h-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                                        <span>{feature}</span>
+                                        <span className="text-sm">{feature}</span>
                                     </li>
                                 ))}
                             </ul>
 
-                            {planKey === "free" ? (
-                                <div className="w-full mt-auto py-3 px-6 text-center font-medium text-gray-600 bg-gray-100 rounded-lg">
-                                    <div className="text-sm">Saldo attuale:</div>
-                                    <div className="text-2xl font-bold text-blue-600">{user.credits} crediti</div>
+                            {packageKey === "free" ? (
+                                <div className="mt-auto py-4 px-6 text-center bg-gray-100 rounded-lg">
+                                    <div className="text-sm text-gray-600 mb-1">Saldo attuale:</div>
+                                    <div className="text-3xl font-bold text-blue-600">{user.credits}</div>
+                                    <div className="text-sm text-gray-500">crediti</div>
                                 </div>
                             ) : (
-                                <>
-                                    <div id={`paypal-btn-plan-${planKey}`} className="mt-4"></div>
-                                </>
+                                <div id={`paypal-button-${packageKey}`} className="mt-auto"></div>
                             )}
                         </div>
                     );
                 })}
             </div>
 
-            {/* --- NOTA --- */}
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mt-12 max-w-3xl mx-auto">
-                <h3 className="font-bold text-gray-800 mb-2">ℹ️ Come funzionano i crediti</h3>
-                <ul className="text-sm text-gray-600 space-y-1">
+                <h3 className="font-bold text-gray-800 mb-3">ℹ️ Come funzionano i crediti</h3>
+                <ul className="text-sm text-gray-600 space-y-2">
                     <li>• I crediti acquistati si <strong>aggiungono</strong> al tuo saldo attuale</li>
                     <li>• Non scadono e non si rinnovano automaticamente</li>
                     <li>• Puoi acquistare più pacchetti quando vuoi</li>
