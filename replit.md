@@ -57,7 +57,10 @@ To make a user an admin:
 ### Firebase Configuration
 Firebase configuration is included in `src/firebase.ts`. The Firebase client API keys are safe to expose in client-side code as Firebase uses security rules to protect data.
 
-**Authentication**: The app uses ONLY Firebase Google Sign-In. There are no alternative login methods.
+**Authentication**: The app uses Firebase Authentication with 3 methods:
+- **Google Sign-In**: Quick login with Google account
+- **Apple Sign-In**: Login with Apple ID
+- **Email/Password**: Traditional email and password authentication with registration
 
 **Important**: To enable Google Sign-In on Replit, you must add the Replit domain to Firebase's authorized domains:
 1. Go to the [Firebase Console](https://console.firebase.google.com)
