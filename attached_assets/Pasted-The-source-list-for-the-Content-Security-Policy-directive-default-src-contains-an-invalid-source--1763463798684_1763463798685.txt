@@ -1,0 +1,99 @@
+The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.Understand this error
+18The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?Understand this error
+18The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.Understand this error
+/~:1 The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.Understand this error
+/~:1 The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?Understand this error
+/~:1 The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.Understand this error
+c2c41bb2a7a7b396.js:2 [Coframe] Replit Enterprise watcher loaded
+c2c41bb2a7a7b396.js:2 
+      /////////////////////
+   ///////////////////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////        Curious and driven?
+  ///////////////@@@@@@@///////        Work with us!
+  ///////////////@@@@@@@///////
+  ///////////////@@@@@@@///////        https://join.replit.com/hack.with.us
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@#//////////////
+   ///////////////////////////
+      /////////////////////
+      
+c2c41bb2a7a7b396.js:2 Download the Apollo DevTools for a better development experience: https://chrome.google.com/webstore/detail/apollo-client-developer-t/jdkknkkbebbapilgoeccciglkfbmbnfm
+c2c41bb2a7a7b396.js:2 [LaunchDarkly] LaunchDarkly client initialized
+gengioia10-1:1 Banner not shown: beforeinstallpromptevent.preventDefault() called. The page must call beforeinstallpromptevent.prompt() to show the banner.
+9Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.Understand this error
+ed1e693c96a75807.js:2 Unrecognized feature: 'ambient-light-sensor'.
+z @ ed1e693c96a75807.js:2Understand this warning
+ed1e693c96a75807.js:2 Unrecognized feature: 'battery'.
+z @ ed1e693c96a75807.js:2Understand this warning
+ed1e693c96a75807.js:2 Unrecognized feature: 'execution-while-not-rendered'.
+z @ ed1e693c96a75807.js:2Understand this warning
+ed1e693c96a75807.js:2 Unrecognized feature: 'execution-while-out-of-viewport'.
+z @ ed1e693c96a75807.js:2Understand this warning
+ed1e693c96a75807.js:2 Unrecognized feature: 'layout-animations'.
+z @ ed1e693c96a75807.js:2Understand this warning
+ed1e693c96a75807.js:2 Unrecognized feature: 'legacy-image-formats'.
+z @ ed1e693c96a75807.js:2Understand this warning
+ed1e693c96a75807.js:2 Unrecognized feature: 'navigation-override'.
+z @ ed1e693c96a75807.js:2Understand this warning
+ed1e693c96a75807.js:2 Unrecognized feature: 'oversized-images'.
+z @ ed1e693c96a75807.js:2Understand this warning
+ed1e693c96a75807.js:2 Unrecognized feature: 'publickey-credentials'.
+z @ ed1e693c96a75807.js:2Understand this warning
+ed1e693c96a75807.js:2 Unrecognized feature: 'speaker-selection'.
+z @ ed1e693c96a75807.js:2Understand this warning
+ed1e693c96a75807.js:2 Unrecognized feature: 'unoptimized-images'.
+z @ ed1e693c96a75807.js:2Understand this warning
+ed1e693c96a75807.js:2 Unrecognized feature: 'unsized-media'.
+z @ ed1e693c96a75807.js:2Understand this warning
+ed1e693c96a75807.js:2 Unrecognized feature: 'pointer-lock'.
+z @ ed1e693c96a75807.js:2Understand this warning
+ed1e693c96a75807.js:2 Allow attribute will take precedence over 'allowfullscreen'.
+z @ ed1e693c96a75807.js:2Understand this warning
+ed1e693c96a75807.js:2 Allow attribute will take precedence over 'allowpaymentrequest'.
+z @ ed1e693c96a75807.js:2Understand this warning
+c2c41bb2a7a7b396.js:2 WARN: A component changed from uncontrolled to controlled.
+(anonymous) @ c2c41bb2a7a7b396.js:2Understand this warning
+stallwart.build.js:1 stallwart: failed ping 1
+stallwart.build.js:1 stallwart: failed ping 2
+stallwart.build.js:1 stallwart: failed ping 3
+stallwart.build.js:1 stallwart: failed ping 4
+stallwart.build.js:1 stallwart: failed ping 5
+stallwart.build.js:1 stallwart: session stalled
+region1.analytics.google.com/g/collect?v=2&tid=G-MPJY3F1YEL&gtm=45je5be1v9135634466za200&_p=1763461525353&gcd=13l3lPl2l2l1&npa=0&dma_cps=syphamo&dma=1&ul=it-it&sr=1920x1080&cid=1916765712.1757507013&ecid=2142648067&ir=1&uaa=x86&uab=64&uafvl=Chromium%3B142.0.7444.163%7CGoogle%2520Chrome%3B142.0.7444.163%7CNot_A%2520Brand%3B99.0.0.0&uamb=0&uam=&uap=Windows&uapv=15.0.0&uaw=0&are=1&frm=0&pscdl=&_eu=EBAIAAQ&_s=52&tag_exp=103116026~103200004~104527906~104528501~104684208~104684211~105446120~115583767~115616986~115938466~115938468~116217636~116217638&dl=https%3A%2F%2Freplit.com%2F~&dp=%2F%40siriomediahouse%2FGioIA10-1&dt=replEnvironmentDesktop&sid=1763461322&sct=4&seg=1&_tu=wAQ&en=Packager%20Packages%20Installed&_ee=1&ep.event_category=All&ep.value=0&_et=24092&tfd=1832902:1  Failed to load resource: net::ERR_CONNECTION_CLOSEDUnderstand this error
+attached_assets/image_1763463325639.png:1  Failed to load resource: the server responded with a status of 404 ()Understand this error
+workspace_iframe.html?initialPath=%2F&id=%3Arn4%3A:32 Unrecognized feature: 'ambient-light-sensor'.Understand this warning
+workspace_iframe.html?initialPath=%2F&id=%3Arn4%3A:32 Unrecognized feature: 'battery'.Understand this warning
+workspace_iframe.html?initialPath=%2F&id=%3Arn4%3A:32 Unrecognized feature: 'execution-while-not-rendered'.Understand this warning
+workspace_iframe.html?initialPath=%2F&id=%3Arn4%3A:32 Unrecognized feature: 'execution-while-out-of-viewport'.Understand this warning
+workspace_iframe.html?initialPath=%2F&id=%3Arn4%3A:32 Unrecognized feature: 'layout-animations'.Understand this warning
+workspace_iframe.html?initialPath=%2F&id=%3Arn4%3A:32 Unrecognized feature: 'legacy-image-formats'.Understand this warning
+workspace_iframe.html?initialPath=%2F&id=%3Arn4%3A:32 Unrecognized feature: 'navigation-override'.Understand this warning
+workspace_iframe.html?initialPath=%2F&id=%3Arn4%3A:32 Unrecognized feature: 'oversized-images'.Understand this warning
+workspace_iframe.html?initialPath=%2F&id=%3Arn4%3A:32 Unrecognized feature: 'publickey-credentials'.Understand this warning
+workspace_iframe.html?initialPath=%2F&id=%3Arn4%3A:32 Unrecognized feature: 'speaker-selection'.Understand this warning
+workspace_iframe.html?initialPath=%2F&id=%3Arn4%3A:32 Unrecognized feature: 'unoptimized-images'.Understand this warning
+workspace_iframe.html?initialPath=%2F&id=%3Arn4%3A:32 Unrecognized feature: 'unsized-media'.Understand this warning
+workspace_iframe.html?initialPath=%2F&id=%3Arn4%3A:32 Allow attribute will take precedence over 'allowfullscreen'.Understand this warning
+workspace_iframe.html?initialPath=%2F&id=%3Arn4%3A:32 Allow attribute will take precedence over 'allowpaymentrequest'.Understand this warning
+Recharts.min.js:1  Failed to load resource: the server responded with a status of 404 ()Understand this error
+client:802 WebSocket connection to 'wss://45ccdb51-903a-4239-a1cd-8a7aac7086ad-00-2p7m8riqczw77.janeway.replit.dev/?token=xXKF7gMsqq9F' failed: 
+createConnection @ client:802Understand this error
+Recharts.min.js:1  Failed to load resource: the server responded with a status of 404 ()Understand this error
+client:802 WebSocket connection to 'wss://45ccdb51-903a-4239-a1cd-8a7aac7086ad-00-2p7m8riqczw77.janeway.replit.dev/?token=xXKF7gMsqq9F' failed: 
+createConnection @ client:802Understand this error
+Recharts.min.js:1  Failed to load resource: the server responded with a status of 404 ()Understand this error
+client:802 WebSocket connection to 'wss://45ccdb51-903a-4239-a1cd-8a7aac7086ad-00-2p7m8riqczw77.janeway.replit.dev/?token=xXKF7gMsqq9F' failed: 
+createConnection @ client:802Understand this error
+(index):64 cdn.tailwindcss.com should not be used in production. To use Tailwind CSS in production, install it as a PostCSS plugin or use the Tailwind CLI: https://tailwindcss.com/docs/installation
+(anonymous) @ (index):64Understand this warning
+Recharts.min.js:1  Failed to load resource: the server responded with a status of 404 ()Understand this error
+(index):47 Service Worker registered: https://45ccdb51-903a-4239-a1cd-8a7aac7086ad-00-2p7m8riqczw77.janeway.replit.dev/
+client:802 WebSocket connection to 'wss://45ccdb51-903a-4239-a1cd-8a7aac7086ad-00-2p7m8riqczw77.janeway.replit.dev/?token=xXKF7gMsqq9F' failed: 
+createConnection @ client:802Understand this error
+client:841 [vite] failed to connect to websocket (Error: WebSocket closed without opened.). 
+connect @ client:841Understand this error
+client:454 Uncaught (in promise) Error: WebSocket closed without opened.
+    at WebSocket.<anonymous> (client:454:22)Understand this error
