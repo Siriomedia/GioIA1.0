@@ -9,9 +9,10 @@ GioIA is an Italian payslip analysis tool that uses Google's Gemini AI to analyz
 - **Authentication**: Firebase Auth (Google Sign-In)
 - **Database**: Cloud Firestore
 - **AI Integration**: Google Gemini AI
-- **Styling**: Tailwind CSS (via CDN)
+- **Styling**: Tailwind CSS (via CDN) with responsive design (mobile-first)
 - **Charts**: Recharts
 - **PDF Generation**: jsPDF + html2canvas
+- **Responsive Design**: Fully optimized for mobile (320px+), tablet (768px+), and desktop (1024px+)
 
 ## Key Features
 - Payslip upload and AI-powered analysis
@@ -123,6 +124,20 @@ Without this, you'll see an `auth/unauthorized-domain` error when attempting to 
 - Created index.css for basic styling
 - Set up development workflow
 - Configured deployment for autoscale with build and preview
+- **Implemented comprehensive responsive design** (mobile-first approach):
+  - Optimized all major components for mobile (320px+), tablet (768px+), and desktop (1024px+)
+  - Updated Layout.tsx: responsive header, compact credit display, adaptive user info
+  - Enhanced Dashboard.tsx: responsive title/export button, mobile-friendly tabs, adaptive cards/charts/tables
+  - Improved Archive.tsx: responsive list items with stacked layout on mobile
+  - Optimized Compare.tsx: horizontally scrollable tables with compact mobile headers
+  - Updated AdminPanel.tsx: responsive user table with adaptive columns and mobile-friendly forms
+  - Enhanced Subscription.tsx: credit packages responsive grid layout
+  - Improved Settings.tsx: responsive forms with mobile-optimized inputs
+  - Optimized Upload.tsx: responsive file upload area and buttons
+  - Updated LeavePlanner.tsx: responsive headers and mobile-friendly buttons
+  - Enhanced ShiftPlanner.tsx: adaptive layout for shift planning
+  - Improved Login.tsx: responsive authentication forms
+  - Updated service worker cache to v32 for new responsive styles
 - **Transformed subscription system into credit recharge packages**:
   - Credits now accumulate (add to existing balance)
   - Features are examples of what you can do with credits

@@ -45,7 +45,7 @@ const LeaveModal: React.FC<{
                             <option>ROL</option>
                         </select>
                     </div>
-                     <div className="grid grid-cols-2 gap-4">
+                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                         <div>
                             <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">Data Inizio</label>
                             <input type="date" id="startDate" value={formData.startDate} onChange={e => setFormData({...formData, startDate: e.target.value})} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required />

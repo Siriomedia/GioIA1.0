@@ -117,7 +117,7 @@ const PlannerModal: React.FC<PlannerModalProps> = ({ isOpen, onClose, onSaveShif
                         <>
                             {intervals.map((interval, index) => (
                                 <div key={interval.id} className="flex items-center gap-2">
-                                    <div className="grid grid-cols-2 gap-2 flex-grow">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-2 flex-grow">
                                         <div>
                                             <label htmlFor={`startTime-${interval.id}`} className="block text-xs font-medium text-gray-700">Inizio</label>
                                             <input type="time" id={`startTime-${interval.id}`} value={interval.startTime} onChange={e => handleIntervalChange(interval.id, 'startTime', e.target.value)} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required />
