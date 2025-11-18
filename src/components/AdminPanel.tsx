@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { User } from '../types.ts';
 import { db, auth } from '../firebase.ts';
-import { collection, onSnapshot, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { collection, onSnapshot, doc, updateDoc, deleteDoc, getDoc, increment } from 'firebase/firestore';
 import { deleteUser as deleteAuthUser } from 'firebase/auth';
 
 interface AdminPanelProps {
@@ -17,6 +17,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ user }) => {
     const [loading, setLoading] = useState(true);
     const [editingUserId, setEditingUserId] = useState<string | null>(null);
     const [newCredits, setNewCredits] = useState<number>(0);
+    const [editMode, setEditMode] = useState<'set' | 'add'>('set'); // 'set' per impostare, 'add' per aggiungere
 
     useEffect(() => {
         if (user.role !== 'admin') {
@@ -60,18 +61,50 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ user }) => {
         return () => unsubscribe();
     }, [user.role]);
 
-    const handleEditCredits = (userId: string, currentCredits: number) => {
+    const handleEditCredits = (userId: string, currentCredits: number, mode: 'set' | 'add') => {
         setEditingUserId(userId);
-        setNewCredits(currentCredits);
+        setEditMode(mode);
+        if (mode === 'set') {
+            setNewCredits(currentCredits);
+        } else {
+            setNewCredits(0); // Per aggiungere, parti da 0
+        }
     };
 
-    const handleSaveCredits = async (userId: string) => {
+    const handleSaveCredits = async (userId: string, currentCredits: number) => {
         try {
             const userRef = doc(db, 'users', userId);
-            await updateDoc(userRef, { credits: newCredits });
+            
+            if (editMode === 'set') {
+                // Modalità "Imposta": imposta valore assoluto
+                if (newCredits < 0) {
+                    alert('⚠️ I crediti non possono essere negativi!');
+                    return;
+                }
+                
+                await updateDoc(userRef, { credits: newCredits });
+                alert(`✅ Crediti impostati a ${newCredits}!`);
+            } else {
+                // Modalità "Regala": usa increment atomico per evitare race conditions
+                if (newCredits === 0) {
+                    alert('⚠️ Inserisci un numero di crediti da aggiungere!');
+                    return;
+                }
+                
+                // SOLO aggiunta (positivi) permessa per evitare race conditions con negativi
+                // Se vuoi rimuovere crediti, usa "Imposta" per impostare il valore finale
+                if (newCredits < 0) {
+                    alert('⚠️ Per rimuovere crediti, usa la funzione "Imposta" e imposta il valore finale desiderato.');
+                    return;
+                }
+                
+                // Usa increment atomico per operazioni concorrenti sicure (solo aggiunte)
+                await updateDoc(userRef, { credits: increment(newCredits) });
+                alert(`✅ Aggiunti ${newCredits} crediti!`);
+            }
             
             setEditingUserId(null);
-            alert('✅ Crediti aggiornati con successo!');
+            setNewCredits(0);
         } catch (error) {
             console.error('Errore nell\'aggiornamento crediti:', error);
             alert('❌ Errore nell\'aggiornamento dei crediti. Riprova.');
@@ -81,6 +114,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ user }) => {
     const handleCancelEdit = () => {
         setEditingUserId(null);
         setNewCredits(0);
+        setEditMode('set');
     };
 
     const handleDeleteUser = async (userId: string, userEmail: string) => {
@@ -192,36 +226,60 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ user }) => {
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 {editingUserId === u.uid ? (
-                                                    <div className="flex items-center space-x-2">
-                                                        <input
-                                                            type="number"
-                                                            value={newCredits}
-                                                            onChange={(e) => setNewCredits(parseInt(e.target.value) || 0)}
-                                                            className="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
-                                                            min="0"
-                                                        />
-                                                        <button
-                                                            onClick={() => handleSaveCredits(u.uid)}
-                                                            className="text-green-600 hover:text-green-800 font-semibold text-xs"
-                                                        >
-                                                            ✓
-                                                        </button>
-                                                        <button
-                                                            onClick={handleCancelEdit}
-                                                            className="text-red-600 hover:text-red-800 font-semibold text-xs"
-                                                        >
-                                                            ✗
-                                                        </button>
+                                                    <div className="flex flex-col space-y-2">
+                                                        <div className="flex items-center space-x-2">
+                                                            <span className="text-xs text-gray-500 font-medium w-16">
+                                                                {editMode === 'set' ? 'Imposta:' : 'Aggiungi:'}
+                                                            </span>
+                                                            <input
+                                                                type="number"
+                                                                value={newCredits}
+                                                                onChange={(e) => setNewCredits(parseInt(e.target.value) || 0)}
+                                                                className="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
+                                                                min="0"
+                                                                placeholder={editMode === 'set' ? 'Totale' : '+Crediti'}
+                                                            />
+                                                            <button
+                                                                onClick={() => handleSaveCredits(u.uid, u.credits)}
+                                                                className="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-xs font-semibold"
+                                                                title="Salva modifiche"
+                                                            >
+                                                                ✓ Salva
+                                                            </button>
+                                                            <button
+                                                                onClick={handleCancelEdit}
+                                                                className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-xs font-semibold"
+                                                                title="Annulla"
+                                                            >
+                                                                ✗ Annulla
+                                                            </button>
+                                                        </div>
+                                                        {editMode === 'add' && (
+                                                            <div className="text-xs text-gray-500 italic">
+                                                                Nuovo totale: {u.credits + newCredits} crediti
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 ) : (
-                                                    <div className="flex items-center space-x-2">
-                                                        <span className="text-sm font-bold text-gray-900">{u.credits}</span>
-                                                        <button
-                                                            onClick={() => handleEditCredits(u.uid, u.credits)}
-                                                            className="text-blue-600 hover:text-blue-800 text-xs underline"
-                                                        >
-                                                            modifica
-                                                        </button>
+                                                    <div className="flex flex-col space-y-1">
+                                                        <span className="text-sm font-bold text-gray-900">{u.credits} crediti</span>
+                                                        <div className="flex items-center space-x-2">
+                                                            <button
+                                                                onClick={() => handleEditCredits(u.uid, u.credits, 'set')}
+                                                                className="text-blue-600 hover:text-blue-800 text-xs underline font-semibold"
+                                                                title="Imposta un valore assoluto di crediti"
+                                                            >
+                                                                🔧 Imposta
+                                                            </button>
+                                                            <span className="text-gray-300">|</span>
+                                                            <button
+                                                                onClick={() => handleEditCredits(u.uid, u.credits, 'add')}
+                                                                className="text-green-600 hover:text-green-800 text-xs underline font-semibold"
+                                                                title="Aggiungi crediti (regalo)"
+                                                            >
+                                                                🎁 Regala
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 )}
                                             </td>
@@ -268,9 +326,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ user }) => {
                     </h3>
                     <ul className="text-sm text-blue-800 space-y-2">
                         <li>• <strong>Visualizzazione in tempo reale</strong> di tutti gli utenti</li>
-                        <li>• <strong>Modifica crediti</strong> di qualsiasi utente</li>
+                        <li>• <strong>🔧 Imposta crediti</strong> - imposta un valore assoluto di crediti</li>
+                        <li>• <strong>🎁 Regala crediti</strong> - aggiungi crediti agli utenti (incrementa)</li>
                         <li>• <strong>Cancellazione account</strong> utente (non admin)</li>
-                        <li>• <strong>Monitoraggio piani</strong> e statistiche</li>
+                        <li>• <strong>Monitoraggio piani</strong> e statistiche in tempo reale</li>
                     </ul>
                 </div>
 

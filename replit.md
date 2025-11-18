@@ -30,14 +30,32 @@ The app uses a credit-based system:
 - No automatic renewals
 - PayPal payment integration for secure transactions
 
+**Technical Implementation** (Race-Condition Safe):
+- **Atomic Operations**: All credit modifications use Firestore's `increment()` function to prevent race conditions
+- **Dual-Flag Guard System**: Two ref flags prevent write loops:
+  - `isUpdatingFromFirestore`: Prevents save effect when Firestore listener updates state
+  - `isAtomicCreditUpdate`: Prevents save effect when atomic increment is used
+- **Real-time Sync**: onSnapshot listener ensures instant credit updates across all sessions
+- **User Consumption**: `handleCreditConsumption` uses atomic `increment(-cost)` 
+- **Admin Operations**: Admin panel uses atomic increments for safe concurrent modifications
+- This architecture ensures that user consumption and admin gifts compose correctly even when concurrent
+
 ### Admin Panel (Admin Users Only)
 Users with `role: 'admin'` in Firebase have access to a comprehensive admin panel with:
 - **Real-time user monitoring**: See all registered users with live updates
-- **Credit management**: Modify any user's credit balance in real-time
+- **Credit management**: Two modes for safe operations:
+  - **🔧 Imposta** (Set): Set absolute credit value (for both adding and removing)
+  - **🎁 Regala** (Gift): Atomic increment for adding credits only (race-condition safe)
 - **Account deletion**: Remove user accounts (admin accounts are protected)
 - **User statistics**: View total users, admin count, and user distribution
 - **Full user details**: View email, plan, credits, role, and personal info
-- **Infinite credits**: Admin users have unlimited credits and can use all features without costs
+- **Infinite credits**: Admin users have unlimited credits (∞) and can use all features without costs
+- **Always-visible credit display**: Credits shown in top-right header with 💎 icon
+
+**Admin Credit Operations**:
+- Use "Imposta" when you need to set a specific final value (e.g., set to 100 credits)
+- Use "Regala" when you want to add credits (e.g., gift +50 credits)
+- Both operations are race-condition safe and work correctly even when multiple admins operate simultaneously
 
 To make a user an admin:
 1. Go to Firebase Console → Firestore Database
@@ -146,6 +164,15 @@ Without this, you'll see an `auth/unauthorized-domain` error when attempting to 
     - Name/place normalization: case-insensitive, accent-insensitive, apostrophe-normalized, whitespace-normalized
   - **Admin bypass**: Admin users bypass all validation checks
   - **Implementation**: geminiService.ts (schema + validation), App.tsx (comparison logic)
+
+## Credit Management System
+- **User Interface**: Credits are always visible in the top-right header with a diamond icon (💎)
+- **Real-time synchronization**: Credits update instantly when modified by admin
+- **Admin Panel**:
+  - **🔧 Imposta** - Set absolute credit value for any user
+  - **🎁 Regala** - Add credits to users (gift credits)
+  - Real-time updates visible to users immediately
+  - Prevents negative credit values
 
 ## Running the Application
 The development server is configured to run automatically on port 5000.

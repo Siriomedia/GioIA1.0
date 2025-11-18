@@ -19,11 +19,12 @@ import { PLANS, CREDIT_COSTS } from './config/plans.ts';
 // FIREBASE
 import { auth, db } from "./firebase.ts";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { doc, getDoc, setDoc, onSnapshot } from "firebase/firestore";
+import { doc, getDoc, setDoc, onSnapshot, increment, updateDoc } from "firebase/firestore";
 
 const App: React.FC = () => {
     const [currentView, setCurrentView] = useState<View>(View.Dashboard);
     const isUpdatingFromFirestore = useRef(false);
+    const isAtomicCreditUpdate = useRef(false);
 
     //
     // LOAD USER FROM LOCAL STORAGE
@@ -100,22 +101,21 @@ const App: React.FC = () => {
             if (snapshot.exists()) {
                 const data = snapshot.data();
                 
-                const updatedUser: User = {
-                    email: data.email,
-                    firstName: data.firstName,
-                    lastName: data.lastName,
-                    role: data.role,
-                    dateOfBirth: data.dateOfBirth,
-                    placeOfBirth: data.placeOfBirth,
-                    plan: data.plan,
-                    credits: data.credits ?? 0,
-                    creditResetDate: "",
-                };
+                // Merge completo: spread tutti i campi esistenti e sovrascrivi con Firestore
+                setUser(prevUser => {
+                    const updatedUser: User = {
+                        ...(prevUser || {}),  // Preserva campi esistenti, gestisce caso null
+                        ...data,              // Sovrascrivi con dati da Firestore
+                        credits: data.credits ?? (prevUser?.credits || 0),
+                        creditResetDate: data.creditResetDate || (prevUser?.creditResetDate || ''),
+                    } as User;
 
-                // Imposta il flag per evitare loop infinito
-                isUpdatingFromFirestore.current = true;
-                setUser(updatedUser);
-                window.localStorage.setItem("gioia_user", JSON.stringify(updatedUser));
+                    // Imposta il flag per evitare loop infinito
+                    isUpdatingFromFirestore.current = true;
+                    window.localStorage.setItem("gioia_user", JSON.stringify(updatedUser));
+                    
+                    return updatedUser;
+                });
             }
         }, (error) => {
             console.error('Errore nel listener Firestore utente:', error);
@@ -138,6 +138,12 @@ const App: React.FC = () => {
         // Se l'aggiornamento viene dal listener Firestore, non salvare di nuovo
         if (isUpdatingFromFirestore.current) {
             isUpdatingFromFirestore.current = false;
+            return;
+        }
+
+        // Se i crediti sono stati aggiornati atomicamente, non sovrascrivere
+        if (isAtomicCreditUpdate.current) {
+            isAtomicCreditUpdate.current = false;
             return;
         }
 
@@ -206,6 +212,16 @@ const App: React.FC = () => {
             return false;
         }
 
+        // Usa increment atomico per evitare race conditions con admin gifts
+        if (auth.currentUser) {
+            const userRef = doc(db, "users", auth.currentUser.uid);
+            updateDoc(userRef, { credits: increment(-cost) }).catch(console.error);
+            
+            // Imposta flag per evitare che useEffect riscriva su Firestore
+            isAtomicCreditUpdate.current = true;
+        }
+        
+        // Aggiorna anche lo stato locale per UI reattiva (verrà sincronizzato dal listener)
         setUser(prev => prev ? { ...prev, credits: prev.credits - cost } : null);
         return true;
     };
