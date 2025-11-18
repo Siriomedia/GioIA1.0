@@ -87,7 +87,7 @@ Grazie per il tuo acquisto!`
         <div>
             {/* --- TITOLO --- */}
             <div className="text-center mb-12">
-                <h1 className="text-4xl font-bold text-gray-800">Pacchetti Ricarica Crediti</h1>
+                <h1 className="text-4xl font-bold text-gray-800">Ricarica i crediti</h1>
                 <p className="text-lg text-gray-500 mt-4 max-w-2xl mx-auto">
                     Acquista pacchetti di crediti che si aggiungono al tuo saldo attuale. Nessun abbonamento, nessun rinnovo automatico.
                 </p>

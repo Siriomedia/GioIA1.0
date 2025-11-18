@@ -13,7 +13,7 @@ const baseItems = [
 ];
 
 const bottomItems = [
-    { id: View.Subscription, label: 'Abbonamento', icon: <SubscriptionIcon /> },
+    { id: View.Subscription, label: 'Crediti', icon: <SubscriptionIcon /> },
     { id: View.Settings, label: 'Impostazioni', icon: <SettingsIcon /> },
 ]
 
