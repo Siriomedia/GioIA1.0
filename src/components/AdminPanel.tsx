@@ -42,13 +42,17 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ user }) => {
                     credits: data.credits || 0,
                     creditResetDate: data.creditResetDate || '',
                     taxId: data.taxId || '',
+                    createdAt: data.createdAt || 0,
                 });
             });
 
+            // Ordina per data di registrazione (più vecchi prima = ordine cronologico)
             usersData.sort((a, b) => {
-                if (a.role === 'admin' && b.role !== 'admin') return -1;
-                if (a.role !== 'admin' && b.role === 'admin') return 1;
-                return a.email.localeCompare(b.email);
+                // Se uno dei due non ha createdAt, mettilo in fondo
+                if (!a.createdAt && !b.createdAt) return a.email.localeCompare(b.email);
+                if (!a.createdAt) return 1;
+                if (!b.createdAt) return -1;
+                return a.createdAt - b.createdAt;
             });
 
             setAllUsers(usersData);
@@ -177,17 +181,17 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ user }) => {
                                         <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-[10px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                             Utente
                                         </th>
-                                        <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-[10px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider hidden md:table-cell">
+                                        <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-[10px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                             Email
                                         </th>
                                         <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-[10px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                            Ruolo
+                                        </th>
+                                        <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-[10px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider hidden md:table-cell">
                                             Piano
                                         </th>
                                         <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-[10px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                             Crediti
-                                        </th>
-                                        <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-[10px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider hidden lg:table-cell">
-                                            Ruolo
                                         </th>
                                         <th className="px-3 sm:px-6 py-3 sm:py-4 text-center text-[10px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                             Azioni
@@ -220,6 +224,15 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ user }) => {
                                                 <div className="text-sm text-gray-900">{u.email}</div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
+                                                <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                                    u.role === 'admin' 
+                                                        ? 'bg-red-100 text-red-800' 
+                                                        : 'bg-green-100 text-green-800'
+                                                }`}>
+                                                    {u.role === 'admin' ? '🔐 Admin' : '👤 User'}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap hidden md:table-cell">
                                                 <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">
                                                     {u.plan}
                                                 </span>
@@ -282,15 +295,6 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ user }) => {
                                                         </div>
                                                     </div>
                                                 )}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                                    u.role === 'admin' 
-                                                        ? 'bg-red-100 text-red-800' 
-                                                        : 'bg-green-100 text-green-800'
-                                                }`}>
-                                                    {u.role === 'admin' ? '🔐 Admin' : '👤 User'}
-                                                </span>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-center">
                                                 {u.role !== 'admin' && (

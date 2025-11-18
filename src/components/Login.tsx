@@ -68,6 +68,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
                 plan: 'free',
                 credits: PLANS.free.credits,
                 creditResetDate: "",
+                createdAt: Date.now(),
             };
 
             await setDoc(userRef, newUserData);

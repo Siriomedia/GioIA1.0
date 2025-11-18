@@ -24,6 +24,7 @@ export interface User {
     plan: Plan;
     credits: number;
     creditResetDate: string; // ISO string
+    createdAt?: number; // Timestamp di registrazione (milliseconds since epoch)
 }
 
 export interface PayItem {
