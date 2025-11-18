@@ -195,18 +195,130 @@ const App: React.FC = () => {
     };
 
     //
-    // ANALYSIS COMPLETE
+    // ANALYSIS COMPLETE - VERIFICA CORRISPONDENZA DATI ANAGRAFICI
     //
     const handleAnalysisComplete = (newPayslip: Payslip) => {
-        const namesMatch =
-            user &&
-            (user.role === "admin" ||
-                (newPayslip.employee.firstName.trim().toLowerCase() === user.firstName.trim().toLowerCase() &&
-                 newPayslip.employee.lastName.trim().toLowerCase() === user.lastName.trim().toLowerCase()));
-
         setSelectedPayslip(newPayslip);
 
-        if (namesMatch) {
+        // Admin bypassa tutti i controlli
+        if (user && user.role === "admin") {
+            const updated = [...payslips, newPayslip].sort((a, b) => {
+                const dA = new Date(a.period.year, a.period.month - 1);
+                const dB = new Date(b.period.year, b.period.month - 1);
+                return dB.getTime() - dA.getTime();
+            });
+            setPayslips(updated);
+            setAlert(null);
+            setCurrentView(View.Dashboard);
+            return;
+        }
+
+        // Controllo completo dei dati anagrafici
+        if (!user) {
+            setAlert("⚠️ Errore: Nessun utente autenticato.");
+            setCurrentView(View.Dashboard);
+            return;
+        }
+
+        // Funzione per normalizzare le date (supporta vari formati italiani e internazionali)
+        const normalizeDate = (dateStr: string | undefined): string => {
+            if (!dateStr) return "";
+            const cleaned = dateStr.trim().replace(/\s+/g, '');
+            
+            // Prova a parsare diversi formati
+            const patterns = [
+                /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/,  // D/M/YYYY o DD/MM/YYYY
+                /^(\d{1,2})-(\d{1,2})-(\d{4})$/,    // D-M-YYYY o DD-MM-YYYY
+                /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/,  // D.M.YYYY o DD.MM.YYYY
+                /^(\d{4})-(\d{1,2})-(\d{1,2})$/,    // YYYY-M-D o YYYY-MM-DD
+                /^(\d{4})\/(\d{1,2})\/(\d{1,2})$/,  // YYYY/M/D o YYYY/MM/DD
+                /^(\d{4})\.(\d{1,2})\.(\d{1,2})$/,  // YYYY.M.D o YYYY.MM.DD
+            ];
+
+            for (const pattern of patterns) {
+                const match = cleaned.match(pattern);
+                if (match) {
+                    let day: string, month: string, year: string;
+                    
+                    // Se è YYYY-M-D (anno all'inizio)
+                    if (match[1].length === 4) {
+                        year = match[1];
+                        month = match[2].padStart(2, '0');
+                        day = match[3].padStart(2, '0');
+                    } else {
+                        // Se è D-M-YYYY (giorno all'inizio)
+                        day = match[1].padStart(2, '0');
+                        month = match[2].padStart(2, '0');
+                        year = match[3];
+                    }
+                    
+                    return `${day}/${month}/${year}`; // Normalizza in DD/MM/YYYY
+                }
+            }
+            
+            return cleaned; // Ritorna come è se non riconosciuto
+        };
+
+        // Funzione per normalizzare i luoghi e nomi (case-insensitive, trim, rimuovi spazi multipli, preserva apostrofi)
+        const normalizePlace = (place: string | undefined): string => {
+            if (!place) return "";
+            return place.trim().toLowerCase()
+                .replace(/\s+/g, ' ')  // Normalizza spazi multipli
+                .replace(/'/g, "'")    // Normalizza apostrofi (smart quote → standard)
+                .replace(/'/g, "'")    // Normalizza altri apostrofi
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // Rimuovi accenti per confronto uniforme
+        };
+
+        // Verifica che TUTTI i campi richiesti siano presenti nel profilo (con controlli sicuri)
+        const userProfileComplete = 
+            user.firstName && user.firstName.trim() !== "" &&
+            user.lastName && user.lastName.trim() !== "" &&
+            user.dateOfBirth && user.dateOfBirth.trim() !== "" &&
+            user.placeOfBirth && user.placeOfBirth.trim() !== "";
+
+        if (!userProfileComplete) {
+            setAlert(
+                `⚠️ PROFILO INCOMPLETO - IMPOSSIBILE SALVARE\n\n` +
+                `Per salvare le buste paga nell'archivio, devi completare il tuo profilo in Impostazioni con:\n\n` +
+                `• Nome\n` +
+                `• Cognome\n` +
+                `• Data di nascita\n` +
+                `• Luogo di nascita\n\n` +
+                `📌 Puoi visualizzare l'analisi temporanea, ma non verrà salvata nell'archivio.\n` +
+                `💡 Vai in Impostazioni e completa i tuoi dati anagrafici.`
+            );
+            setCurrentView(View.Dashboard);
+            return;
+        }
+
+        // Verifica che TUTTI i campi richiesti siano presenti nella busta paga (con controlli sicuri)
+        const payslipDataComplete =
+            newPayslip.employee.firstName && newPayslip.employee.firstName.trim() !== "" &&
+            newPayslip.employee.lastName && newPayslip.employee.lastName.trim() !== "" &&
+            newPayslip.employee.dateOfBirth && newPayslip.employee.dateOfBirth.trim() !== "" &&
+            newPayslip.employee.placeOfBirth && newPayslip.employee.placeOfBirth.trim() !== "";
+
+        if (!payslipDataComplete) {
+            setAlert(
+                `⚠️ DATI INCOMPLETI NELLA BUSTA PAGA\n\n` +
+                `La busta paga non contiene tutti i dati anagrafici necessari (nome, cognome, data di nascita, luogo di nascita).\n\n` +
+                `📌 Puoi visualizzare l'analisi temporanea, ma non verrà salvata nell'archivio.\n` +
+                `💡 Assicurati che la busta paga sia leggibile e contenga tutti i dati.`
+            );
+            setCurrentView(View.Dashboard);
+            return;
+        }
+
+        // Confronto normalizzato di tutti i campi
+        const firstNameMatch = normalizePlace(newPayslip.employee.firstName) === normalizePlace(user.firstName);
+        const lastNameMatch = normalizePlace(newPayslip.employee.lastName) === normalizePlace(user.lastName);
+        const dateOfBirthMatch = normalizeDate(newPayslip.employee.dateOfBirth) === normalizeDate(user.dateOfBirth);
+        const placeOfBirthMatch = normalizePlace(newPayslip.employee.placeOfBirth) === normalizePlace(user.placeOfBirth);
+
+        const allDataMatches = firstNameMatch && lastNameMatch && dateOfBirthMatch && placeOfBirthMatch;
+
+        if (allDataMatches) {
+            // DATI CORRISPONDENTI → Salva busta paga
             const updated = [...payslips, newPayslip].sort((a, b) => {
                 const dA = new Date(a.period.year, a.period.month - 1);
                 const dB = new Date(b.period.year, b.period.month - 1);
@@ -215,7 +327,20 @@ const App: React.FC = () => {
             setPayslips(updated);
             setAlert(null);
         } else {
-            setAlert("Attenzione: i dati non corrispondono al profilo.");
+            // DATI NON CORRISPONDENTI → Solo analisi temporanea
+            let mismatchDetails = "I seguenti dati non corrispondono:\n\n";
+            if (!firstNameMatch) mismatchDetails += `• Nome: "${newPayslip.employee.firstName}" ≠ "${user.firstName}"\n`;
+            if (!lastNameMatch) mismatchDetails += `• Cognome: "${newPayslip.employee.lastName}" ≠ "${user.lastName}"\n`;
+            if (!dateOfBirthMatch) mismatchDetails += `• Data di nascita: "${newPayslip.employee.dateOfBirth}" ≠ "${user.dateOfBirth}"\n`;
+            if (!placeOfBirthMatch) mismatchDetails += `• Luogo di nascita: "${newPayslip.employee.placeOfBirth}" ≠ "${user.placeOfBirth}"\n`;
+
+            setAlert(
+                `⚠️ ANALISI TEMPORANEA - DATI NON SALVATI\n\n` +
+                `Questa busta paga non corrisponde ai tuoi dati anagrafici.\n\n` +
+                mismatchDetails +
+                `\n📌 Puoi visualizzare l'analisi ma NON verrà salvata nell'archivio.\n` +
+                `💡 Se è la tua busta paga, verifica e aggiorna i tuoi dati in Impostazioni.`
+            );
         }
 
         setCurrentView(View.Dashboard);

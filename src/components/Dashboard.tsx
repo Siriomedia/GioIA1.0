@@ -185,11 +185,13 @@ const Dashboard: React.FC<DashboardProps> = ({ payslip, alert, payslips, handleC
                 </div>
             )}
             {alert && (
-                 <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6 rounded-md shadow-sm flex items-start" role="alert">
-                    <InfoIcon className="w-6 h-6 mr-3 text-yellow-500 flex-shrink-0" />
-                    <div>
-                        <p className="font-bold">Attenzione</p>
-                        <p>{alert}</p>
+                 <div className="bg-yellow-50 border-2 border-yellow-400 text-yellow-900 p-5 mb-6 rounded-xl shadow-lg" role="alert">
+                    <div className="flex items-start">
+                        <InfoIcon className="w-7 h-7 mr-4 text-yellow-600 flex-shrink-0 mt-1" />
+                        <div className="flex-1">
+                            <p className="font-bold text-lg mb-2">⚠️ Attenzione</p>
+                            <p className="whitespace-pre-line text-sm leading-relaxed">{alert}</p>
+                        </div>
                     </div>
                 </div>
             )}

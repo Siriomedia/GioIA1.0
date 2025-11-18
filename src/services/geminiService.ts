@@ -492,6 +492,8 @@ const payslipSchema = {
                 firstName: { type: Type.STRING, description: "Nome del dipendente." },
                 lastName: { type: Type.STRING, description: "Cognome del dipendente." },
                 taxId: { type: Type.STRING, description: "Codice Fiscale del dipendente." },
+                dateOfBirth: { type: Type.STRING, description: "Data di nascita del dipendente (formato: GG/MM/AAAA o simile)." },
+                placeOfBirth: { type: Type.STRING, description: "Luogo di nascita del dipendente (città o comune)." },
                 level: { type: Type.STRING, description: "Livello contrattuale del dipendente." },
                 contractType: { type: Type.STRING, description: "Tipo di contratto (es. 'Commercio', 'Metalmeccanico')." },
             },
@@ -563,7 +565,7 @@ const payslipSchema = {
 export const analyzePayslip = async (file: File): Promise<Payslip> => {
     const imagePart = await fileToGenerativePart(file);
     const prompt = `Esegui un'analisi estremamente analitica e approfondita di questa busta paga italiana. Non tralasciare alcun dettaglio. Interpreta ogni singola voce, numero e codice, anche se posizionata in modo non standard. Popola lo schema JSON fornito con la massima precisione e granularità.
-- **Dati Anagrafici e Contrattuali**: Estrai tutti i dati relativi all'azienda e al dipendente, inclusi livello, CCNL, qualifica, etc.
+- **Dati Anagrafici e Contrattuali**: Estrai tutti i dati relativi all'azienda e al dipendente. Per il dipendente, estrai Nome, Cognome, Codice Fiscale, Data di Nascita, Luogo di Nascita, livello, CCNL, qualifica, etc. IMPORTANTE: cerca attentamente data e luogo di nascita del dipendente nel documento.
 - **Elementi della Retribuzione**: Identifica la sezione 'Elementi della Retribuzione' (o simile) e popola l'array \`remunerationElements\` con ogni singola voce che contribuisce alla retribuzione mensile lorda (es. Paga Base, Contingenza, Scatti Anzianità, Superminimo, E.D.R.). È fondamentale che questa sezione sia completa.
 - **Corpo della Busta Paga**: Popola \`incomeItems\` con TUTTE le competenze a favore del dipendente (incluse quelle di base già elencate in \`remunerationElements\`) e \`deductionItems\` con tutte le trattenute.
 - **Dati Fiscali, Previdenziali, TFR**: Dettaglia con precisione tutte le sezioni relative a IRPEF, contributi INPS, Trattamento di Fine Rapporto, e lo stato di ferie e permessi.

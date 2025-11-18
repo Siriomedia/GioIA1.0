@@ -124,9 +124,19 @@ Without this, you'll see an `auth/unauthorized-domain` error when attempting to 
   - Removed all alternative authentication methods
   - Removed admin login with email/password
   - Removed hardcoded admin email check
-  - Authentication is ONLY via Firebase Google Sign-In
+  - Authentication via Firebase: Google Sign-In, Apple Sign-In, Email/Password
   - Admin role managed exclusively through Firebase Firestore
   - Removed `password` field from User type
+- **Data validation for payslip analysis**:
+  - ALL 4 required fields must be present in both user profile and payslip: firstName, lastName, dateOfBirth, placeOfBirth
+  - If user profile is incomplete: shows "PROFILO INCOMPLETO" error, temporary analysis only
+  - If payslip data is incomplete: shows "DATI INCOMPLETI NELLA BUSTA PAGA" error, temporary analysis only
+  - If data doesn't match: shows detailed mismatch error, temporary analysis only, NOT saved to archive
+  - If data matches: payslip is saved to archive normally
+  - Robust date normalization: supports D/M/YYYY, DD/MM/YYYY, YYYY-MM-DD, with separators: / - .
+  - Name/place normalization: case-insensitive, accent-insensitive, apostrophe-normalized, whitespace-normalized
+  - Admin users bypass all validation checks
+  - Updated Gemini schema to extract date and place of birth from payslips
 
 ## Running the Application
 The development server is configured to run automatically on port 5000.

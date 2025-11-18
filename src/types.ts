@@ -55,6 +55,8 @@ export interface Payslip {
         firstName: string;
         lastName: string;
         taxId: string;
+        dateOfBirth?: string;
+        placeOfBirth?: string;
         level?: string;
         contractType?: string;
     };
