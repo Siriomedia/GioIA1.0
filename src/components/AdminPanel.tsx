@@ -147,49 +147,49 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ user }) => {
     }
 
     return (
-        <div className="p-6">
-            <div className="mb-8">
-                <h1 className="text-4xl font-bold text-gray-800 mb-2">🔐 Pannello Amministrazione</h1>
-                <p className="text-gray-500">Gestisci utenti, crediti e permessi del sistema</p>
+        <div className="p-3 sm:p-6">
+            <div className="mb-6 sm:mb-8">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-2">🔐 Pannello Amministrazione</h1>
+                <p className="text-sm sm:text-base text-gray-500">Gestisci utenti, crediti e permessi del sistema</p>
             </div>
 
             {loading ? (
-                <div className="bg-white p-12 rounded-xl shadow-md text-center">
+                <div className="bg-white p-8 sm:p-12 rounded-xl shadow-md text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                    <p className="text-gray-500">Caricamento utenti...</p>
+                    <p className="text-sm sm:text-base text-gray-500">Caricamento utenti...</p>
                 </div>
             ) : (
                 <div className="bg-white rounded-xl shadow-md overflow-hidden">
-                    <div className="p-6 bg-gradient-to-r from-blue-600 to-blue-700">
-                        <h2 className="text-2xl font-bold text-white mb-1">👥 Utenti Registrati</h2>
-                        <p className="text-blue-100 text-sm">
-                            Totale utenti: <span className="font-bold">{allUsers.length}</span> | 
+                    <div className="p-4 sm:p-6 bg-gradient-to-r from-blue-600 to-blue-700">
+                        <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-1">👥 Utenti Registrati</h2>
+                        <p className="text-blue-100 text-xs sm:text-sm">
+                            Totale: <span className="font-bold">{allUsers.length}</span> | 
                             Admin: <span className="font-bold">{allUsers.filter(u => u.role === 'admin').length}</span> | 
                             Utenti: <span className="font-bold">{allUsers.filter(u => u.role === 'user').length}</span>
                         </p>
                     </div>
 
                     {allUsers.length > 0 ? (
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-sm">
+                        <div className="overflow-x-auto -mx-3 sm:mx-0 px-3 sm:px-0">
+                            <table className="w-full text-xs sm:text-sm min-w-[800px]">
                                 <thead className="bg-gray-50 border-b-2 border-gray-200">
                                     <tr>
-                                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                        <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-[10px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                             Utente
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                        <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-[10px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider hidden md:table-cell">
                                             Email
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                        <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-[10px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                             Piano
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                        <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-[10px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                             Crediti
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                        <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-[10px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider hidden lg:table-cell">
                                             Ruolo
                                         </th>
-                                        <th className="px-6 py-4 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                        <th className="px-3 sm:px-6 py-3 sm:py-4 text-center text-[10px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                             Azioni
                                         </th>
                                     </tr>

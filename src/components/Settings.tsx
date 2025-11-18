@@ -77,14 +77,14 @@ const Settings: React.FC<SettingsProps> = ({ user, onSave, onPasswordChange }) =
 
     return (
         <div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-6">Impostazioni</h1>
-            <div className="max-w-2xl mx-auto space-y-8">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 mb-4 sm:mb-6">Impostazioni</h1>
+            <div className="max-w-2xl mx-auto space-y-6 sm:space-y-8">
                 {/* User Data Form */}
-                <div className="bg-white p-8 rounded-xl shadow-md">
-                    <h2 className="text-xl font-bold text-gray-800 mb-4">I Tuoi Dati Anagrafici</h2>
-                    <p className="text-sm text-gray-500 mb-6">Questi dati vengono utilizzati per verificare la corrispondenza con le buste paga caricate.</p>
-                    <form onSubmit={handleDataSubmit} className="space-y-4">
-                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-white p-4 sm:p-6 md:p-8 rounded-xl shadow-md">
+                    <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-3 sm:mb-4">I Tuoi Dati Anagrafici</h2>
+                    <p className="text-xs sm:text-sm text-gray-500 mb-4 sm:mb-6">Questi dati vengono utilizzati per verificare la corrispondenza con le buste paga caricate.</p>
+                    <form onSubmit={handleDataSubmit} className="space-y-3 sm:space-y-4">
+                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                             <div>
                                 <label htmlFor="firstName" className="block text-sm font-medium text-gray-600">Nome</label>
                                 <input type="text" name="firstName" id="firstName" value={formData.firstName} onChange={handleDataChange} className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required />
@@ -102,21 +102,21 @@ const Settings: React.FC<SettingsProps> = ({ user, onSave, onPasswordChange }) =
                             <label htmlFor="placeOfBirth" className="block text-sm font-medium text-gray-600">Luogo di Nascita</label>
                             <input type="text" name="placeOfBirth" id="placeOfBirth" value={formData.placeOfBirth} onChange={handleDataChange} className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" />
                         </div>
-                        <div className="pt-4 flex justify-end">
-                            <button type="submit" className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition-colors">
+                        <div className="pt-3 sm:pt-4 flex justify-end">
+                            <button type="submit" className="w-full sm:w-auto px-4 sm:px-6 py-2 text-sm sm:text-base bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition-colors">
                                 Salva Modifiche
                             </button>
                         </div>
-                        {successMessage && <p className="text-sm text-green-600 mt-2">{successMessage}</p>}
+                        {successMessage && <p className="text-xs sm:text-sm text-green-600 mt-2">{successMessage}</p>}
                     </form>
                 </div>
 
                 {/* Password Change Form - only for admin with manual login */}
                 {user.role === 'admin' && user.password && (
-                    <div className="bg-white p-8 rounded-xl shadow-md">
-                        <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center"><LockIcon className="mr-2"/> Sicurezza e Password</h2>
-                        <p className="text-sm text-gray-500 mb-6">Modifica la password per l'accesso manuale come amministratore.</p>
-                        <form onSubmit={handlePasswordSubmit} className="space-y-4">
+                    <div className="bg-white p-4 sm:p-6 md:p-8 rounded-xl shadow-md">
+                        <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-3 sm:mb-4 flex items-center"><LockIcon className="mr-2"/> Sicurezza e Password</h2>
+                        <p className="text-xs sm:text-sm text-gray-500 mb-4 sm:mb-6">Modifica la password per l'accesso manuale come amministratore.</p>
+                        <form onSubmit={handlePasswordSubmit} className="space-y-3 sm:space-y-4">
                             <div>
                                 <label htmlFor="oldPassword"  className="block text-sm font-medium text-gray-600">Vecchia Password</label>
                                 <input type="password" id="oldPassword" value={oldPassword} onChange={e => setOldPassword(e.target.value)} className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required />

@@ -76,13 +76,13 @@ const Upload: React.FC<UploadProps> = ({ onAnalysisComplete, handleCreditConsump
 
     return (
         <div className="max-w-2xl mx-auto">
-            <h1 className="text-3xl font-bold text-gray-800 mb-6">Carica Busta Paga</h1>
-            <div className="bg-white p-8 rounded-xl shadow-md">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 mb-4 sm:mb-6">Carica Busta Paga</h1>
+            <div className="bg-white p-4 sm:p-6 md:p-8 rounded-xl shadow-md">
                 {isLoading ? (
                     <div className="text-center">
                         <Spinner />
-                        <p className="mt-4 text-lg font-semibold text-blue-600">Analisi in corso...</p>
-                        <p className="text-gray-500">L'IA sta leggendo la tua busta paga. Potrebbe volerci un momento.</p>
+                        <p className="mt-4 text-base sm:text-lg font-semibold text-blue-600">Analisi in corso...</p>
+                        <p className="text-sm sm:text-base text-gray-500">L'IA sta leggendo la tua busta paga. Potrebbe volerci un momento.</p>
                     </div>
                 ) : (
                     <>
@@ -91,36 +91,37 @@ const Upload: React.FC<UploadProps> = ({ onAnalysisComplete, handleCreditConsump
                             onDrop={handleDrop}
                             onDragOver={handleDragOver}
                             onDragLeave={handleDragLeave}
-                            className={`flex flex-col items-center justify-center w-full p-10 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${isDragOver ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-400 hover:bg-gray-50'}`}
+                            className={`flex flex-col items-center justify-center w-full p-6 sm:p-8 md:p-10 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${isDragOver ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-400 hover:bg-gray-50'}`}
                         >
-                            <UploadIcon className="w-12 h-12 text-gray-400 mb-4" />
-                            <div>
-                                <span className="text-blue-600 font-semibold">Scegli un file</span>
-                                <span className="text-gray-500 ml-1">o trascinalo qui</span>
+                            <UploadIcon className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400 mb-3 sm:mb-4" />
+                            <div className="text-center">
+                                <span className="text-sm sm:text-base text-blue-600 font-semibold">Scegli un file</span>
+                                <span className="text-sm sm:text-base text-gray-500 ml-1">o trascinalo qui</span>
                             </div>
                             <input id="file-upload" name="file-upload" type="file" className="hidden" onChange={handleFileChange} accept=".pdf,.jpg,.jpeg,.png" />
-                            <p className="text-xs text-gray-400 mt-2">PDF, PNG, JPG (MAX. 10MB)</p>
+                            <p className="text-[10px] sm:text-xs text-gray-400 mt-2">PDF, PNG, JPG (MAX. 10MB)</p>
                         </label>
 
                         {file && (
-                            <div className="mt-6 text-center font-medium text-gray-700">
-                                File selezionato: {file.name}
+                            <div className="mt-4 sm:mt-6 text-center font-medium text-sm sm:text-base text-gray-700">
+                                File selezionato: <span className="break-all">{file.name}</span>
                             </div>
                         )}
 
                         {error && (
-                            <div className="mt-4 text-center text-red-600 bg-red-100 p-3 rounded-lg">
+                            <div className="mt-4 text-center text-sm sm:text-base text-red-600 bg-red-100 p-3 rounded-lg">
                                 {error}
                             </div>
                         )}
 
-                        <div className="mt-8 text-center">
+                        <div className="mt-6 sm:mt-8 text-center">
                             <button
                                 onClick={handleSubmit}
                                 disabled={!file || isLoading}
-                                className="w-full md:w-auto px-8 py-3 bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all"
+                                className="w-full md:w-auto px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all"
                             >
-                                Analizza Documento (-{CREDIT_COSTS.PAYSLIP_ANALYSIS} crediti)
+                                <span className="hidden sm:inline">Analizza Documento (-{CREDIT_COSTS.PAYSLIP_ANALYSIS} crediti)</span>
+                                <span className="sm:hidden">Analizza (-{CREDIT_COSTS.PAYSLIP_ANALYSIS})</span>
                             </button>
                         </div>
                     </>
