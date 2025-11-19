@@ -6,9 +6,10 @@ import {
     OAuthProvider
 } from "firebase/auth";
 import { auth, googleProvider, db } from "../firebase";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { LogoIcon } from "./common/Icons";
 import { PLANS } from "../config/plans";
+import { normalizeTimestamp } from "../utils/timestampHelpers";
 
 interface LoginProps {
     onLoginSuccess: (user: any) => void;
@@ -47,6 +48,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
                 plan: userData.plan || 'free',
                 credits: userData.credits ?? 10,
                 creditResetDate: userData.creditResetDate || "",
+                createdAt: normalizeTimestamp(userData.createdAt, Date.now()),
             });
         } else {
             let fName = customFirstName || "";
@@ -58,6 +60,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
                 lName = nameParts.slice(1).join(" ") || "";
             }
 
+            // Crea documento base senza createdAt (verrà aggiunto solo in Firestore)
             const newUserData = {
                 email: fbUser.email,
                 firstName: fName,
@@ -68,11 +71,45 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
                 plan: 'free',
                 credits: PLANS.free.credits,
                 creditResetDate: "",
-                createdAt: Date.now(),
             };
 
-            await setDoc(userRef, newUserData);
-            onLoginSuccess(newUserData);
+            // Salva in Firestore con serverTimestamp (solo per Firestore, non nello stato locale)
+            await setDoc(userRef, {
+                ...newUserData,
+                createdAt: serverTimestamp(),
+            });
+            
+            // Rileggi il documento per ottenere il timestamp server-side effettivo
+            const savedSnap = await getDoc(userRef);
+            if (savedSnap.exists()) {
+                const savedData = savedSnap.data();
+                onLoginSuccess({
+                    email: savedData.email,
+                    firstName: savedData.firstName,
+                    lastName: savedData.lastName,
+                    role: savedData.role || 'user',
+                    dateOfBirth: savedData.dateOfBirth || "",
+                    placeOfBirth: savedData.placeOfBirth || "",
+                    plan: savedData.plan || 'free',
+                    credits: savedData.credits ?? PLANS.free.credits,
+                    creditResetDate: savedData.creditResetDate || "",
+                    createdAt: normalizeTimestamp(savedData.createdAt, Date.now()),
+                });
+            } else {
+                // Fallback se la rilettura fallisce (non dovrebbe succedere)
+                onLoginSuccess({
+                    email: fbUser.email,
+                    firstName: fName,
+                    lastName: lName,
+                    role: 'user',
+                    dateOfBirth: "",
+                    placeOfBirth: "",
+                    plan: 'free',
+                    credits: PLANS.free.credits,
+                    creditResetDate: "",
+                    createdAt: Date.now(), // Fallback timestamp
+                });
+            }
         }
 
         setLoading(false);

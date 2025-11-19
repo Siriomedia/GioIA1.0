@@ -3,6 +3,7 @@ import { User } from '../types.ts';
 import { db, auth } from '../firebase.ts';
 import { collection, onSnapshot, doc, updateDoc, deleteDoc, getDoc, increment } from 'firebase/firestore';
 import { deleteUser as deleteAuthUser } from 'firebase/auth';
+import { normalizeTimestamp } from '../utils/timestampHelpers.ts';
 
 interface AdminPanelProps {
     user: User;
@@ -42,7 +43,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ user }) => {
                     credits: data.credits || 0,
                     creditResetDate: data.creditResetDate || '',
                     taxId: data.taxId || '',
-                    createdAt: data.createdAt || 0,
+                    createdAt: normalizeTimestamp(data.createdAt, Date.now()),
                 });
             });
 

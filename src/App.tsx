@@ -15,11 +15,12 @@ import UpgradeModal from './components/UpgradeModal.tsx';
 
 import { View, Payslip, User, Shift, LeavePlan, Absence, Plan } from './types.ts';
 import { PLANS, CREDIT_COSTS } from './config/plans.ts';
+import { normalizeTimestamp } from './utils/timestampHelpers.ts';
 
 // FIREBASE
 import { auth, db } from "./firebase.ts";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { doc, getDoc, setDoc, onSnapshot, increment, updateDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, onSnapshot, increment, updateDoc, serverTimestamp } from "firebase/firestore";
 
 const App: React.FC = () => {
     const [currentView, setCurrentView] = useState<View>(View.Dashboard);
@@ -80,10 +81,65 @@ const App: React.FC = () => {
                     plan: data.plan,
                     credits: data.credits ?? 0,
                     creditResetDate: "", // non serve più
+                    createdAt: normalizeTimestamp(data.createdAt, Date.now()),
                 };
 
                 setUser(mergedUser);
                 window.localStorage.setItem("gioia_user", JSON.stringify(mergedUser));
+            } else {
+                // Documento Firestore non esiste - crealo automaticamente
+                let firstName = "";
+                let lastName = "";
+
+                // Prova a estrarre nome e cognome dal displayName (Google/Apple login)
+                if (fbUser.displayName) {
+                    const nameParts = fbUser.displayName.split(" ");
+                    firstName = nameParts[0] || "";
+                    lastName = nameParts.slice(1).join(" ") || "";
+                }
+
+                const newUserData: User = {
+                    email: fbUser.email || "",
+                    firstName: firstName,
+                    lastName: lastName,
+                    role: 'user',
+                    dateOfBirth: "",
+                    placeOfBirth: "",
+                    plan: 'free',
+                    credits: PLANS.free.credits,
+                    creditResetDate: "",
+                    createdAt: Date.now(), // Fallback se la rilettura fallisce
+                };
+
+                // Salva in Firestore con campo createdAt per ordinamento cronologico
+                await setDoc(ref, {
+                    ...newUserData,
+                    createdAt: serverTimestamp(),
+                }, { merge: true });
+
+                // Rileggi il documento per ottenere il timestamp server-side effettivo
+                const savedSnap = await getDoc(ref);
+                if (savedSnap.exists()) {
+                    const savedData = savedSnap.data();
+                    const completeUserData: User = {
+                        email: savedData.email,
+                        firstName: savedData.firstName,
+                        lastName: savedData.lastName,
+                        role: savedData.role,
+                        dateOfBirth: savedData.dateOfBirth,
+                        placeOfBirth: savedData.placeOfBirth,
+                        plan: savedData.plan,
+                        credits: savedData.credits ?? 0,
+                        creditResetDate: savedData.creditResetDate || "",
+                        createdAt: normalizeTimestamp(savedData.createdAt, Date.now()),
+                    };
+                    setUser(completeUserData);
+                    window.localStorage.setItem("gioia_user", JSON.stringify(completeUserData));
+                } else {
+                    // Fallback se la rilettura fallisce
+                    setUser(newUserData);
+                    window.localStorage.setItem("gioia_user", JSON.stringify(newUserData));
+                }
             }
         });
 
@@ -108,6 +164,7 @@ const App: React.FC = () => {
                         ...data,              // Sovrascrivi con dati da Firestore
                         credits: data.credits ?? (prevUser?.credits || 0),
                         creditResetDate: data.creditResetDate || (prevUser?.creditResetDate || ''),
+                        createdAt: normalizeTimestamp(data.createdAt, prevUser?.createdAt || Date.now()),
                     } as User;
 
                     // Imposta il flag per evitare loop infinito
@@ -150,7 +207,10 @@ const App: React.FC = () => {
         const saveToFirestore = async () => {
             if (!auth.currentUser) return;
             const ref = doc(db, "users", auth.currentUser.uid);
-            await setDoc(ref, user, { merge: true });
+            
+            // Rimuovi createdAt dallo stato locale prima di salvare per non sovrascriverlo
+            const { createdAt, ...userDataToSave } = user as any;
+            await setDoc(ref, userDataToSave, { merge: true });
         };
 
         saveToFirestore().catch(console.error);
