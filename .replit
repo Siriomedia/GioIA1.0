@@ -15,15 +15,15 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Development Server"
+args = "Production Preview"
 
 [[workflows.workflow]]
-name = "Development Server"
+name = "Production Preview"
 author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npm run dev"
+args = "npm run preview"
 waitForPort = 5000
 
 [workflows.workflow.metadata]
@@ -35,6 +35,10 @@ externalPort = 80
 
 [[ports]]
 localPort = 5001
+externalPort = 3000
+
+[[ports]]
+localPort = 46609
 externalPort = 3001
 
 [deployment]
