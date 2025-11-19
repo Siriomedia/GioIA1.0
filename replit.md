@@ -9,7 +9,7 @@ GioIA is an Italian payslip analysis tool that uses Google's Gemini AI to analyz
 - **Authentication**: Firebase Auth (Google Sign-In)
 - **Database**: Cloud Firestore
 - **AI Integration**: Google Gemini AI
-- **Styling**: Tailwind CSS (via CDN) with responsive design (mobile-first)
+- **Styling**: Tailwind CSS 3.4.17 (PostCSS) with responsive design (mobile-first)
 - **Charts**: Recharts
 - **PDF Generation**: jsPDF + html2canvas
 - **Responsive Design**: Fully optimized for mobile (320px+), tablet (768px+), and desktop (1024px+)
@@ -70,6 +70,7 @@ To make a user an admin:
 - Port: 5000 (required for Replit)
 - Host: 0.0.0.0
 - HMR: Configured for Replit's proxy environment
+- Base path: Relative (./) for correct asset resolution in production
 
 ### Environment Variables
 - `GEMINI_API_KEY`: Required for AI analysis features (Google Gemini API key)
@@ -115,7 +116,29 @@ Without this, you'll see an `auth/unauthorized-domain` error when attempting to 
 └── package.json         # Dependencies
 ```
 
-## Recent Changes (Nov 18, 2025)
+## Recent Changes
+
+### Nov 19, 2025 - Build System & Production Fixes
+- **Fixed production build issues**:
+  - Added `base: './'` to vite.config.ts for relative asset paths
+  - Prevents MIME type errors when serving from different paths
+  - Ensures assets load correctly in both dev and production
+- **Migrated Tailwind CSS from CDN to PostCSS**:
+  - Installed tailwindcss@3.4.17, postcss, autoprefixer
+  - Created tailwind.config.js with content paths
+  - Created postcss.config.js for build pipeline
+  - Created src/index.css with @tailwind directives
+  - Removed CDN script from index.html
+  - Build now generates compiled CSS bundle (~34 kB)
+  - Eliminates CDN warning for production use
+  - Faster initial load time with compiled assets
+- **Admin Panel improvements**:
+  - Added `createdAt` timestamp field to User type
+  - Users now displayed in chronological registration order (oldest to newest)
+  - Made "Ruolo" and "Email" columns always visible on all screen sizes
+  - Real-time updates via onSnapshot listener
+
+### Nov 18, 2025 - Initial Setup & Responsive Design
 - Imported from GitHub to Replit
 - Updated Vite config to use port 5000 for Replit compatibility
 - Added `allowedHosts: true` to Vite config for Replit's proxy
