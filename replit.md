@@ -118,7 +118,15 @@ Without this, you'll see an `auth/unauthorized-domain` error when attempting to 
 
 ## Recent Changes
 
-### Nov 19, 2025 - Build System & Production Fixes
+### Nov 19, 2025 - Admin Panel Synchronization & Build Fixes
+- **Fixed admin panel user synchronization**:
+  - Auto-creates Firestore documents for users without them on first login
+  - Implemented backward-compatible timestamp normalization (src/utils/timestampHelpers.ts)
+  - Supports both Firestore Timestamp objects and legacy numeric timestamps
+  - Server-authoritative timestamps via serverTimestamp() for new users
+  - Prevents createdAt field overwrite on subsequent user saves
+  - Created comprehensive Firestore rules guide (FIRESTORE_RULES.md)
+  - Users must update Firestore security rules to allow admin read access
 - **Fixed production build issues**:
   - Added `base: './'` to vite.config.ts for relative asset paths
   - Prevents MIME type errors when serving from different paths
@@ -137,6 +145,7 @@ Without this, you'll see an `auth/unauthorized-domain` error when attempting to 
   - Users now displayed in chronological registration order (oldest to newest)
   - Made "Ruolo" and "Email" columns always visible on all screen sizes
   - Real-time updates via onSnapshot listener
+  - Timestamp normalization handles missing/legacy data gracefully
 
 ### Nov 18, 2025 - Initial Setup & Responsive Design
 - Imported from GitHub to Replit
