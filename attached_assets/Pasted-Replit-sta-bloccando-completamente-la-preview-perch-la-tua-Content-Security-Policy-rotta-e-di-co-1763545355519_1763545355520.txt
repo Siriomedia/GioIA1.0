@@ -1,0 +1,84 @@
+Replit sta bloccando completamente la preview perché la tua Content Security Policy è rotta e, di conseguenza, ogni file JS viene servito come HTML, da cui la valanga di errori “Expected a module script but got text/html”.
+
+Non sei di fronte a mille errori diversi: tutto nasce da una singola origine.
+
+Il punto critico
+
+La tua CSP contiene queste due bombe:
+
+'unsafe-dynamic' → non è supportata, viene ignorata
+
+report-uri inserito nella stessa direttiva → invalida tutta la default-src
+
+Il browser, quando la CSP è invalida, non la ignora:
+la spezza, applica solo i pezzi validi, e blocca tutto il resto.
+
+E Replit, quando la CSP è invalida, finisce per servire index.html per qualunque risorsa, incluso:
+
+index.js
+
+index.tsx
+
+Recharts.min.js
+
+moduli vite
+
+react-refresh
+
+Risultato: ogni asset torna come text/html → preview KO.
+
+Cosa devi fare subito (e risolve tutto)
+
+Apri il tuo file dove hai inserito gli header — probabilmente:
+
+index.html tramite <meta http-equiv="Content-Security-Policy" ...>
+oppure
+
+un file server.js o replit.nix
+oppure
+
+“Hosting → Headers” nel pannello Replit
+
+Cerca la tua direttiva CSP.
+
+Assomiglia a qualcosa del genere:
+
+default-src 'self' 'unsafe-dynamic' https://... report-uri /api/xxxx/security/?sentry_key=...
+
+
+Deve essere riscritta così:
+
+default-src 'self';
+script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://unpkg.com;
+style-src 'self' 'unsafe-inline';
+img-src * data:;
+connect-src *;
+report-uri /api/4509669501698048/security/;
+
+
+Tre punti fondamentali:
+
+report-uri deve stare in una direttiva separata
+
+unsafe-dynamic va tolto (Chrome non lo supporta)
+
+le fonti script vanno isolate in script-src, non in default-src
+
+Perché ora la preview non appare nemmeno?
+
+Replit usa iframe con sandbox molto restrittivi.
+Se la tua CSP è invalida, il browser non riesce a calcolare le policy consentite, blocca lo script principale e di conseguenza la preview non può eseguire React/Vite.
+
+Replit mostra una pagina vuota o errore di caricamento: normale.
+
+Cosa fare dopo aver corretto la CSP
+
+Salva.
+
+Ricostruisci (npm run build).
+
+Ripubblica.
+
+Riapri la preview.
+
+La build inizierà a servire file JS veri, non HTML, e tutto tornerà a respirare.
