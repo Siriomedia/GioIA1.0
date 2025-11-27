@@ -110,17 +110,37 @@ export interface ChatMessage {
     sender: 'user' | 'ai';
 }
 
+export interface MonthlyData {
+    month: number;
+    year: number;
+    netSalary: number;
+    grossSalary: number;
+    totalDeductions: number;
+    items: {
+        description: string;
+        value: number;
+        type: 'income' | 'deduction' | 'other';
+    }[];
+}
+
+export interface MonthlyComparison {
+    description: string;
+    type: 'income' | 'deduction' | 'other' | 'summary';
+    values: {
+        month: number;
+        year: number;
+        value: number;
+        differenceFromPrevious: number | null;
+    }[];
+}
+
 export interface HistoricalAnalysisResult {
     summary: string;
-    averageNetSalary: number;
-    averageGrossSalary: number;
-    differingItems: {
-        description: string;
-        currentValue: number;
-        averageValue: number;
-        difference: number;
-        type: 'income' | 'deduction' | 'other';
-        comment: string;
+    monthlyData: MonthlyData[];
+    comparisons: MonthlyComparison[];
+    insights: {
+        category: string;
+        observation: string;
     }[];
 }
 
