@@ -42,7 +42,11 @@ const Archive: React.FC<ArchiveProps> = ({ payslips, onSelectPayslip, onCompare,
                 <button 
                     onClick={handleCompareClick}
                     disabled={selectedForCompare.length !== 2}
-                    className="px-3 sm:px-4 py-2 text-sm sm:text-base bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 disabled:bg-gray-400 transition-colors whitespace-nowrap"
+                    className={`px-3 sm:px-4 py-2 text-sm sm:text-base font-semibold rounded-lg shadow-md transition-colors whitespace-nowrap ${
+                        selectedForCompare.length === 2 
+                            ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer' 
+                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    }`}
                 >
                     <span className="hidden sm:inline">Confronta Selezionati ({selectedForCompare.length}/2)</span>
                     <span className="sm:hidden">Confronta ({selectedForCompare.length}/2)</span>
@@ -52,6 +56,12 @@ const Archive: React.FC<ArchiveProps> = ({ payslips, onSelectPayslip, onCompare,
             {payslips.length === 0 ? (
                 <p className="text-center text-sm sm:text-base text-gray-500 mt-6 sm:mt-8">Nessuna busta paga in archivio.</p>
             ) : (
+                <>
+                {selectedForCompare.length < 2 && (
+                    <p className="text-sm text-gray-500 mb-3 italic">
+                        Seleziona 2 buste paga usando le caselle a sinistra per confrontarle
+                    </p>
+                )}
                 <div className="bg-white rounded-xl shadow-md overflow-hidden">
                     <ul className="divide-y divide-gray-200">
                         {payslips.map(p => (
@@ -62,7 +72,7 @@ const Archive: React.FC<ArchiveProps> = ({ payslips, onSelectPayslip, onCompare,
                                         id={`compare-${p.id}`}
                                         name={`compare-${p.id}`}
                                         aria-label={`Seleziona per confronto: ${getMonthName(p.period.month)} ${p.period.year}`}
-                                        className="h-4 w-4 sm:h-5 sm:w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 mt-1 sm:mt-0"
+                                        className="h-5 w-5 sm:h-6 sm:w-6 rounded border-2 border-gray-400 text-blue-600 focus:ring-blue-500 cursor-pointer accent-blue-600"
                                         checked={selectedForCompare.includes(p.id)}
                                         onChange={() => toggleCompareSelection(p.id)}
                                     />
@@ -96,6 +106,7 @@ const Archive: React.FC<ArchiveProps> = ({ payslips, onSelectPayslip, onCompare,
                         ))}
                     </ul>
                 </div>
+                </>
             )}
         </div>
     );
