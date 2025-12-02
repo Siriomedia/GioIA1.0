@@ -1,14 +1,12 @@
-const CACHE_NAME = 'gioia-cache-v36';
+const CACHE_NAME = 'gioia-cache-v37';
 const urlsToCache = [
   '/',
   '/index.html',
   '/manifest.json'
-  // Non includere index.tsx o altri file TSX qui, 
-  // verranno salvati in cache dinamicamente durante il fetch.
 ];
 
-// Install event: open cache and add app shell files
 self.addEventListener('install', event => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
@@ -18,72 +16,88 @@ self.addEventListener('install', event => {
   );
 });
 
-// Fetch event: serve from cache, fallback to network, then cache the new resource
 self.addEventListener('fetch', event => {
-  // We only want to cache GET requests.
   if (event.request.method !== 'GET') {
     return;
   }
 
-  // Non gestire richieste a API di terze parti come Gemini
-  if (event.request.url.includes('generativela' + 'nguage.googleapis.com')) { // Split to avoid self-caching issues
+  if (event.request.url.includes('generativelanguage.googleapis.com')) {
     return fetch(event.request);
+  }
+
+  const url = new URL(event.request.url);
+  const isHtmlOrScript = 
+    event.request.destination === 'document' ||
+    event.request.destination === 'script' ||
+    url.pathname.endsWith('.js') ||
+    url.pathname.endsWith('.css') ||
+    url.pathname === '/' ||
+    url.pathname.endsWith('.html');
+
+  if (isHtmlOrScript) {
+    event.respondWith(
+      fetch(event.request)
+        .then(networkResponse => {
+          if (networkResponse && networkResponse.status === 200) {
+            const responseToCache = networkResponse.clone();
+            caches.open(CACHE_NAME).then(cache => {
+              cache.put(event.request, responseToCache);
+            });
+          }
+          return networkResponse;
+        })
+        .catch(() => {
+          return caches.match(event.request);
+        })
+    );
+    return;
   }
 
   event.respondWith(
     caches.match(event.request)
       .then(cachedResponse => {
-        // If the resource is in the cache, return it
         if (cachedResponse) {
           return cachedResponse;
         }
 
-        // If the resource is not in the cache, fetch it from the network
-        return fetch(event.request).then(
-          networkResponse => {
-            // Check if we received a valid response.
-            if (
-              !networkResponse || 
-              networkResponse.status !== 200 ||
-              // Non salvare in cache risposte opache (es. da CDN senza CORS)
-              networkResponse.type === 'opaque'
-            ) {
-              return networkResponse;
-            }
-
-            // Clone the response because it's a one-time use stream
-            const responseToCache = networkResponse.clone();
-
-            caches.open(CACHE_NAME)
-              .then(cache => {
-                // Cache the new resource for future use
-                cache.put(event.request, responseToCache);
-              });
-
+        return fetch(event.request).then(networkResponse => {
+          if (!networkResponse || networkResponse.status !== 200 || networkResponse.type === 'opaque') {
             return networkResponse;
           }
-        ).catch(error => {
-            console.error('Fetching failed:', error);
-            // Qui potresti restituire una pagina di fallback offline se ne avessi una.
+
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put(event.request, responseToCache);
+          });
+
+          return networkResponse;
+        }).catch(error => {
+          console.error('Fetching failed:', error);
         });
       })
   );
 });
 
-
-// Activate event: clean up old caches
 self.addEventListener('activate', event => {
-  const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
-            console.log('Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
+    Promise.all([
+      self.clients.claim(),
+      caches.keys().then(cacheNames => {
+        return Promise.all(
+          cacheNames.map(cacheName => {
+            if (cacheName !== CACHE_NAME) {
+              console.log('Deleting old cache:', cacheName);
+              return caches.delete(cacheName);
+            }
+          })
+        );
+      })
+    ])
   );
+});
+
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
